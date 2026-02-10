@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Ride - Bus Mate</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .booking-hero {
+            padding: 120px 0 40px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 136, 112, 0.2) 0%, var(--color-background) 100%);
+        }
+
+        .booking-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .booking-form,
+        .booking-summary {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--color-heading);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--color-muted);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            color: var(--color-foreground);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .seat-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .seat {
+            aspect-ratio: 1;
+            border: 2px solid var(--color-border);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--color-surface);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .seat:hover:not(.occupied):not(.selected) {
+            border-color: var(--color-primary);
+            background: rgba(0, 136, 112, 0.1);
+        }
+
+        .seat.selected {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+
+        .seat.occupied {
+            background: var(--color-muted);
+            border-color: var(--color-muted);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .seat-legend {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 0.25rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: var(--color-muted);
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--color-heading);
+        }
+
+        .total-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--color-border);
+        }
+
+        .total-amount {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .success-message {
+            background: rgba(0, 136, 112, 0.1);
+            border: 1px solid var(--color-primary);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            color: var(--color-primary);
+        }
+
+        @media (max-width: 768px) {
+            .booking-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .seat-selector {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="index.html" class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="6" width="18" height="13" rx="2"/>
+                        <path d="M3 9h18M8 19v2m8-2v2M8 6V4m8 2V4"/>
+                    </svg>
+                    <span class="logo-text">Bus Mate</span>
+                </a>
+                <div class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="vehicles.html" class="nav-link">Vehicles</a></li>
+                    <li><a href="tracking.html" class="nav-link">Track</a></li>
+                    <li><a href="driver-dashboard.html" class="nav-link">Driver</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section class="booking-hero">
+            <div class="container">
+                <h1 class="fade-in">Book Your Ride</h1>
+                <p class="hero-description fade-in">Complete your booking in just a few steps</p>
+            </div>
+        </section>
+
+        <!-- Booking Form -->
+        <div class="booking-container">
+            <div class="booking-grid">
+                <!-- Left: Form -->
+                <div class="booking-form">
+                    <form id="bookingForm">
+                        <div class="form-section">
+                            <h3>Trip Details</h3>
+                            <div class="form-group">
+                                <label>From</label>
+                                <input type="text" id="fromLocation" placeholder="Pickup location" required>
+                            </div>
+                            <div class="form-group">
+                                <label>To</label>
+                                <input type="text" id="toLocation" placeholder="Drop-off location" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" id="travelDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Vehicle Type</label>
+                                <select id="vehicleType" required>
+                                    <option value="">Select vehicle type</option>
+                                    <option value="government">Government Bus - ₹25</option>
+                                    <option value="private">Private Bus - ₹45</option>
+                                    <option value="chartered">Chartered Bus - ₹150</option>
+                                    <option value="erickshaw">E-Rickshaw - ₹10</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Passenger Details</h3>
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="passengerName" placeholder="Enter your name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="passengerEmail" placeholder="your@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" id="passengerPhone" placeholder="+91 1234567890" required>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Select Seats</h3>
+                            <div class="seat-selector" id="seatSelector">
+                                <!-- Seats will be generated by JavaScript -->
+                            </div>
+                            <div class="seat-legend">
+                                <div class="legend-item">
+                                    <div class="legend-box" style="background: var(--color-surface); border: 2px solid var(--color-border);"></div>
+                                    <span>Available</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-box" style="background: var(--color-primary);"></div>
+                                    <span>Selected</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-box" style="background: var(--color-muted); opacity: 0.5;"></div>
+                                    <span>Occupied</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right: Summary -->
+                <div class="booking-summary">
+                    <h3>Booking Summary</h3>
+                    <div class="summary-item">
+                        <span class="summary-label">Route</span>
+                        <span class="summary-value" id="summaryRoute">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Date</span>
+                        <span class="summary-value" id="summaryDate">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Vehicle</span>
+                        <span class="summary-value" id="summaryVehicle">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Passenger</span>
+                        <span class="summary-value" id="summaryPassenger">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Selected Seats</span>
+                        <span class="summary-value" id="summarySeats">None</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Base Fare</span>
+                        <span class="summary-value" id="summaryFare">₹0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Service Fee</span>
+                        <span class="summary-value">₹10</span>
+                    </div>
+                    
+                    <div class="total-section">
+                        <div class="total-amount">
+                            <span>Total Amount</span>
+                            <span id="totalAmount">₹0</span>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 2rem;" onclick="confirmBooking()">
+                        Confirm Booking
+                    </button>
+
+                    <div class="success-message" id="successMessage">
+                        <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        <h3 style="margin-bottom: 0.5rem;">Booking Confirmed!</h3>
+                        <p style="color: var(--color-muted);">Your booking has been confirmed. Check your email for details.</p>
+                        <a href="tracking.html" class="btn btn-primary" style="margin-top: 1rem;">Track Your Ride</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="6" width="18" height="13" rx="2"/>
+                            <path d="M3 9h18M8 19v2m8-2v2M8 6V4m8 2V4"/>
+                        </svg>
+                        <span class="logo-text">Bus Mate</span>
+                    </a>
+                    <p class="footer-tagline">Smart travel solutions for everyone</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Bus Mate. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+    <script>
+        const vehiclePrices = {
+            government: 25,
+            private: 45,
+            chartered: 150,
+            erickshaw: 10
+        };
+
+        let selectedSeats = [];
+
+        // Generate seats
+        function generateSeats() {
+            const seatSelector = document.getElementById('seatSelector');
+            seatSelector.innerHTML = '';
+            
+            // Generate 20 seats, some occupied randomly
+            for (let i = 1; i <= 20; i++) {
+                const isOccupied = Math.random() > 0.7;
+                const seat = document.createElement('div');
+                seat.className = `seat ${isOccupied ? 'occupied' : ''}`;
+                seat.textContent = i;
+                seat.dataset.seatNumber = i;
+                
+                if (!isOccupied) {
+                    seat.onclick = () => toggleSeat(seat);
+                }
+                
+                seatSelector.appendChild(seat);
+            }
+        }
+
+        function toggleSeat(seat) {
+            const seatNumber = seat.dataset.seatNumber;
+            
+            if (seat.classList.contains('selected')) {
+                seat.classList.remove('selected');
+                selectedSeats = selectedSeats.filter(s => s !== seatNumber);
+            } else {
+                seat.classList.add('selected');
+                selectedSeats.push(seatNumber);
+            }
+            
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const from = document.getElementById('fromLocation').value;
+            const to = document.getElementById('toLocation').value;
+            const date = document.getElementById('travelDate').value;
+            const vehicleType = document.getElementById('vehicleType').value;
+            const name = document.getElementById('passengerName').value;
+
+            // Update summary fields
+            document.getElementById('summaryRoute').textContent = (from && to) ? `${from} → ${to}` : '-';
+            document.getElementById('summaryDate').textContent = date || '-';
+            document.getElementById('summaryVehicle').textContent = vehicleType ? vehicleType.charAt(0).toUpperCase() + vehicleType.slice(1) + ' Bus' : '-';
+            document.getElementById('summaryPassenger').textContent = name || '-';
+            document.getElementById('summarySeats').textContent = selectedSeats.length > 0 ? selectedSeats.join(', ') : 'None';
+
+            // Calculate fare
+            const baseFare = vehicleType ? vehiclePrices[vehicleType] * selectedSeats.length : 0;
+            const serviceFee = baseFare > 0 ? 10 : 0;
+            const total = baseFare + serviceFee;
+
+            document.getElementById('summaryFare').textContent = `₹${baseFare}`;
+            document.getElementById('totalAmount').textContent = `₹${total}`;
+        }
+
+        function confirmBooking() {
+            const form = document.getElementById('bookingForm');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            if (selectedSeats.length === 0) {
+                alert('Please select at least one seat');
+                return;
+            }
+
+            // Show success message
+            document.getElementById('successMessage').classList.add('show');
+            
+            // Scroll to success message
+            document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Event listeners
+        document.getElementById('fromLocation').addEventListener('input', updateSummary);
+        document.getElementById('toLocation').addEventListener('input', updateSummary);
+        document.getElementById('travelDate').addEventListener('change', updateSummary);
+        document.getElementById('vehicleType').addEventListener('change', updateSummary);
+        document.getElementById('passengerName').addEventListener('input', updateSummary);
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('travelDate').setAttribute('min', today);
+
+        // Initialize
+        generateSeats();
+    </script>
+</body>
+</html>

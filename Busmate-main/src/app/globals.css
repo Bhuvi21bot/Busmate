@@ -1,0 +1,116 @@
+/* Updated: 2025-12-05T15:59:56.876Z */
+/* Updated: 2025-12-04T10:15:49.989Z */
+/* Updated: 2025-12-03T09:55:15.836Z */
+/* Updated: 2025-12-02T11:57:03.418Z */
+/* Updated: 2025-12-02T11:36:43.337Z */
+/* Updated: 2025-12-02T11:08:12.920Z */
+/* Updated: 2025-12-02T11:03:39.917Z */
+/* Updated: 2025-12-01T11:22:13.805Z */
+/* Updated: 2025-12-01T11:13:21.225Z */
+/* Updated: 2025-12-01T11:02:20.120Z */
+/* Updated: 2025-11-30T10:42:36.316Z */
+/* Updated: 2025-11-29T16:12:49.537Z */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Pure black background for dark mode */
+  --color-background: oklch(0 0 0);
+  --color-foreground: oklch(0.75 0.12 145);
+  --color-card: oklch(0.08 0.005 145);
+  --color-card-foreground: oklch(0.75 0.12 145);
+  --color-popover: oklch(0.08 0.005 145);
+  --color-popover-foreground: oklch(0.75 0.12 145);
+  --color-primary: oklch(0.65 0.18 150);
+  --color-primary-foreground: oklch(0.98 0 0);
+  --color-secondary: oklch(0.12 0.01 145);
+  --color-secondary-foreground: oklch(0.75 0.12 145);
+  --color-muted: oklch(0.15 0.01 145);
+  --color-muted-foreground: oklch(0.6 0.08 145);
+  --color-accent: oklch(0.18 0.015 150);
+  --color-accent-foreground: oklch(0.75 0.12 145);
+  --color-destructive: oklch(0.58 0.24 27);
+  --color-border: oklch(0.2 0.015 145);
+  --color-input: oklch(0.15 0.015 145);
+  --color-ring: oklch(0.65 0.18 150);
+  --color-surface: oklch(0.05 0.005 145);
+  --color-heading: oklch(0.85 0.15 145);
+  --radius-lg: 0.75rem;
+  --radius-md: 0.625rem;
+  --radius-sm: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-heading font-bold;
+    font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
+  }
+
+  /* Light theme - pure white background */
+  .light {
+    --color-background: oklch(1 0 0);
+    --color-foreground: oklch(0.2 0 0);
+    --color-card: oklch(0.98 0 0);
+    --color-card-foreground: oklch(0.2 0 0);
+    --color-popover: oklch(0.98 0 0);
+    --color-popover-foreground: oklch(0.2 0 0);
+    --color-primary: oklch(0.5 0.15 150);
+    --color-primary-foreground: oklch(1 0 0);
+    --color-secondary: oklch(0.95 0 0);
+    --color-secondary-foreground: oklch(0.2 0 0);
+    --color-muted: oklch(0.92 0 0);
+    --color-muted-foreground: oklch(0.5 0 0);
+    --color-accent: oklch(0.95 0.005 150);
+    --color-accent-foreground: oklch(0.2 0 0);
+    --color-border: oklch(0.85 0 0);
+    --color-input: oklch(0.9 0 0);
+    --color-surface: oklch(0.97 0 0);
+    --color-heading: oklch(0.15 0 0);
+  }
+
+  /* Blob animation */
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+}
+
+/* Hide Next.js error overlay portal */
+nextjs-portal {
+  display: none !important;
+}
