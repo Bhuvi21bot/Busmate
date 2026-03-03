@@ -19,6 +19,40 @@ export const authClient = createAuthClient({
 });
 
 type SessionData = ReturnType<typeof authClient.useSession>
+const SESSION_CACHE_TTL_MS = 10000;
+let cachedSession: any = null;
+let cachedAt = 0;
+let sessionRequestInFlight: Promise<any> | null = null;
+
+async function requestSession(force = false) {
+   const now = Date.now();
+   if (!force && cachedAt > 0 && now - cachedAt < SESSION_CACHE_TTL_MS) {
+      return cachedSession;
+   }
+
+   if (sessionRequestInFlight) {
+      return sessionRequestInFlight;
+   }
+
+   sessionRequestInFlight = authClient.getSession({
+      fetchOptions: {
+         auth: {
+            type: "Bearer",
+            token: typeof window !== 'undefined' ? localStorage.getItem("bearer_token") || "" : "",
+         },
+      },
+   })
+      .then((res) => {
+         cachedSession = res.data;
+         cachedAt = Date.now();
+         return res.data;
+      })
+      .finally(() => {
+         sessionRequestInFlight = null;
+      });
+
+   return sessionRequestInFlight;
+}
 
 export function useSession(): SessionData {
    const [session, setSession] = useState<any>(null);
@@ -28,20 +62,13 @@ export function useSession(): SessionData {
    const refetch = () => {
       setIsPending(true);
       setError(null);
-      fetchSession();
+      fetchSession(true);
    };
 
-   const fetchSession = async () => {
+   const fetchSession = async (force = false) => {
       try {
-         const res = await authClient.getSession({
-            fetchOptions: {
-               auth: {
-                  type: "Bearer",
-                  token: typeof window !== 'undefined' ? localStorage.getItem("bearer_token") || "" : "",
-               },
-            },
-         });
-         setSession(res.data);
+         const data = await requestSession(force);
+         setSession(data);
          setError(null);
       } catch (err) {
          setSession(null);

@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -27,6 +27,7 @@ export default function Home() {
   const [loadingDrivers, setLoadingDrivers] = useState(false)
   const [driversError, setDriversError] = useState<string | null>(null)
   const [currentTrackingCard, setCurrentTrackingCard] = useState(0)
+  const hasFetchedDrivers = useRef(false)
 
   // Tracking card options
   const trackingCards = [
@@ -96,6 +97,8 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    if (hasFetchedDrivers.current) return
+
     const fetchDrivers = async () => {
       setLoadingDrivers(true)
       setDriversError(null)
@@ -187,6 +190,7 @@ export default function Home() {
     }
 
     if (!isLoading) {
+      hasFetchedDrivers.current = true
       fetchDrivers()
     }
   }, [isLoading])

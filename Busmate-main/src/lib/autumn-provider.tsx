@@ -1,4 +1,3 @@
-
 "use client"
 import { AutumnProvider } from "autumn-js/react";
 import React from "react";

@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "baseline-browser-mapping": "^2.10.0"
+  },
+  "dependencies": {
+    "openai": "^6.22.0"
+  }
+}

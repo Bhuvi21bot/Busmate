@@ -50,12 +50,12 @@
   }
   
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-green-600 font-sans antialiased;
     font-family: 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply text-heading font-bold;
+    @apply text-white font-bold;
     font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
   }
 

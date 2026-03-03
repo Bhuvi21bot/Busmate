@@ -13,10 +13,9 @@ export const metadata: Metadata = {
   title: "Bus Mate - Smart Bus Booking Platform",
   description: "Book government, private, and chartered buses with ease. Real-time tracking, verified drivers, and seamless connectivity.",
   icons: {
-    icon: '/favicon.png',
-    shortcut: '/favicon.png',
-    apple: '/icon.png'
-  }
+    icon: '/favicon.jpg',
+    shortcut: '/favicon.jpg',
+    apple: '/favicon.jpg',  }
 };
 
 export default function RootLayout({
