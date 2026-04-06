@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard - Bus Mate</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .driver-hero {
+            padding: 120px 0 40px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 136, 112, 0.2) 0%, var(--color-background) 100%);
+        }
+
+        .driver-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        .registration-form {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-section h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-heading);
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--color-muted);
+        }
+
+        .form-group label .required {
+            color: #ef4444;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            color: var(--color-foreground);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background: var(--color-card);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .file-upload {
+            position: relative;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1rem;
+            background: var(--color-surface);
+            border: 2px dashed var(--color-border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--color-muted);
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--color-primary);
+            background: rgba(0, 136, 112, 0.05);
+        }
+
+        .file-upload svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--color-primary);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--color-surface);
+            border-radius: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            color: var(--color-foreground);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .benefit-card {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .benefit-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            color: var(--color-primary);
+        }
+
+        .benefit-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit-description {
+            font-size: 0.875rem;
+            color: var(--color-muted);
+        }
+
+        .success-message {
+            background: rgba(0, 136, 112, 0.1);
+            border: 1px solid var(--color-primary);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            color: var(--color-primary);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="index.html" class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="6" width="18" height="13" rx="2"/>
+                        <path d="M3 9h18M8 19v2m8-2v2M8 6V4m8 2V4"/>
+                    </svg>
+                    <span class="logo-text">Bus Mate</span>
+                </a>
+                <div class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="vehicles.html" class="nav-link">Vehicles</a></li>
+                    <li><a href="booking.html" class="nav-link">Book</a></li>
+                    <li><a href="tracking.html" class="nav-link">Track</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section class="driver-hero">
+            <div class="container">
+                <h1 class="fade-in">Join as a Driver</h1>
+                <p class="hero-description fade-in">Start earning with Bus Mate today</p>
+            </div>
+        </section>
+
+        <!-- Benefits -->
+        <div class="container">
+            <div class="benefits-grid">
+                <div class="benefit-card fade-in-up">
+                    <svg class="benefit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23"/>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                    <h3 class="benefit-title">Great Earnings</h3>
+                    <p class="benefit-description">Earn competitive fares with regular bonuses</p>
+                </div>
+                <div class="benefit-card fade-in-up" style="animation-delay: 0.1s">
+                    <svg class="benefit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <h3 class="benefit-title">Flexible Hours</h3>
+                    <p class="benefit-description">Work on your own schedule</p>
+                </div>
+                <div class="benefit-card fade-in-up" style="animation-delay: 0.2s">
+                    <svg class="benefit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                    <h3 class="benefit-title">Weekly Payouts</h3>
+                    <p class="benefit-description">Get paid every week directly to your account</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="driver-container">
+            <div class="registration-form">
+                <form id="driverForm">
+                    <!-- Personal Information -->
+                    <div class="form-section">
+                        <h3>Personal Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>First Name <span class="required">*</span></label>
+                                <input type="text" id="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name <span class="required">*</span></label>
+                                <input type="text" id="lastName" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email <span class="required">*</span></label>
+                                <input type="email" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number <span class="required">*</span></label>
+                                <input type="tel" id="phone" placeholder="+91 1234567890" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Address <span class="required">*</span></label>
+                            <textarea id="address" placeholder="Enter your full address" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Information -->
+                    <div class="form-section">
+                        <h3>Vehicle Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Vehicle Type <span class="required">*</span></label>
+                                <select id="vehicleType" required>
+                                    <option value="">Select vehicle type</option>
+                                    <option value="government">Government Bus</option>
+                                    <option value="private">Private Bus</option>
+                                    <option value="chartered">Chartered Bus</option>
+                                    <option value="erickshaw">E-Rickshaw</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Vehicle Number <span class="required">*</span></label>
+                                <input type="text" id="vehicleNumber" placeholder="XX-00-XX-0000" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Seating Capacity <span class="required">*</span></label>
+                                <input type="number" id="seatingCapacity" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Vehicle Model</label>
+                                <input type="text" id="vehicleModel" placeholder="e.g., Tata Starbus">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- License Information -->
+                    <div class="form-section">
+                        <h3>License & Documents</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>License Number <span class="required">*</span></label>
+                                <input type="text" id="licenseNumber" required>
+                            </div>
+                            <div class="form-group">
+                                <label>License Expiry Date <span class="required">*</span></label>
+                                <input type="date" id="licenseExpiry" required>
+                            </div>
+                        </div>
+                        <div class="form-group file-upload">
+                            <label>Upload License <span class="required">*</span></label>
+                            <input type="file" id="licenseFile" accept="image/*,.pdf" required>
+                            <label for="licenseFile" class="file-upload-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <span>Click to upload license</span>
+                            </label>
+                            <div class="file-name" id="licenseFileName"></div>
+                        </div>
+                        <div class="form-group file-upload">
+                            <label>Vehicle Registration Certificate <span class="required">*</span></label>
+                            <input type="file" id="rcFile" accept="image/*,.pdf" required>
+                            <label for="rcFile" class="file-upload-label">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <span>Click to upload RC</span>
+                            </label>
+                            <div class="file-name" id="rcFileName"></div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-section">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms">I agree to the <a href="#" style="color: var(--color-primary);">Terms and Conditions</a> and <a href="#" style="color: var(--color-primary);">Privacy Policy</a></label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+                        Submit Application
+                    </button>
+                </form>
+
+                <div class="success-message" id="successMessage">
+                    <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <h2 style="margin-bottom: 1rem;">Application Submitted!</h2>
+                    <p style="color: var(--color-muted); margin-bottom: 1.5rem;">
+                        Thank you for applying to become a Bus Mate driver. We'll review your application and get back to you within 2-3 business days.
+                    </p>
+                    <a href="index.html" class="btn btn-primary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="6" width="18" height="13" rx="2"/>
+                            <path d="M3 9h18M8 19v2m8-2v2M8 6V4m8 2V4"/>
+                        </svg>
+                        <span class="logo-text">Bus Mate</span>
+                    </a>
+                    <p class="footer-tagline">Smart travel solutions for everyone</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Bus Mate. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+    <script>
+        // File upload handlers
+        document.getElementById('licenseFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            document.getElementById('licenseFileName').textContent = fileName ? `Selected: ${fileName}` : '';
+        });
+
+        document.getElementById('rcFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            document.getElementById('rcFileName').textContent = fileName ? `Selected: ${fileName}` : '';
+        });
+
+        // Set minimum license expiry date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('licenseExpiry').setAttribute('min', today);
+
+        // Form submission
+        document.getElementById('driverForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Hide form and show success message
+            this.style.display = 'none';
+            document.getElementById('successMessage').classList.add('show');
+            
+            // Scroll to success message
+            document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    </script>
+</body>
+</html>

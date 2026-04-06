@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Vehicles - Bus Mate</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .vehicles-hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 136, 112, 0.2) 0%, var(--color-background) 100%);
+        }
+
+        .vehicles-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+        }
+
+        .filters-section {
+            padding: 2rem 0;
+            background: var(--color-card);
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 70px;
+            z-index: 100;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--color-muted);
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            color: var(--color-foreground);
+            font-size: 1rem;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 3rem 0;
+        }
+
+        .vehicle-card {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--color-primary);
+            box-shadow: 0 10px 30px rgba(0, 136, 112, 0.2);
+        }
+
+        .vehicle-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--color-primary), #4ade80);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .vehicle-image svg {
+            width: 80px;
+            height: 80px;
+            color: white;
+        }
+
+        .vehicle-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .vehicle-content {
+            padding: 1.5rem;
+        }
+
+        .vehicle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .vehicle-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .vehicle-type {
+            font-size: 0.875rem;
+            color: var(--color-muted);
+        }
+
+        .vehicle-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #fbbf24;
+        }
+
+        .vehicle-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--color-muted);
+        }
+
+        .info-item svg {
+            width: 16px;
+            height: 16px;
+            color: var(--color-primary);
+        }
+
+        .vehicle-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-tag {
+            padding: 0.25rem 0.75rem;
+            background: rgba(0, 136, 112, 0.1);
+            border: 1px solid rgba(0, 136, 112, 0.3);
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--color-primary);
+        }
+
+        .vehicle-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .vehicle-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .price-label {
+            font-size: 0.75rem;
+            color: var(--color-muted);
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="index.html" class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="6" width="18" height="13" rx="2"/>
+                        <path d="M3 9h18M8 19v2m8-2v2M8 6V4m8 2V4"/>
+                    </svg>
+                    <span class="logo-text">Bus Mate</span>
+                </a>
+                <div class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="index.html#about" class="nav-link">About</a></li>
+                    <li><a href="index.html#services" class="nav-link">Services</a></li>
+                    <li><a href="tracking.html" class="nav-link">Track</a></li>
+                    <li><a href="booking.html" class="btn btn-primary">Book Now</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section class="vehicles-hero">
+            <div class="container">
+                <h1 class="fade-in">Available Vehicles</h1>
+                <p class="hero-description fade-in">Choose your perfect ride from our fleet</p>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="filters-section">
+            <div class="container">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Vehicle Type</label>
+                        <select id="typeFilter">
+                            <option value="all">All Types</option>
+                            <option value="government">Government Bus</option>
+                            <option value="private">Private Bus</option>
+                            <option value="chartered">Chartered Bus</option>
+                            <option value="erickshaw">E-Rickshaw</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Route</label>
+                        <input type="text" id="routeFilter" placeholder="Enter route or destination">
+                    </div>
+                    <div class="filter-group">
+                        <label>Seats Available</label>
+                        <select id="seatsFilter">
+                            <option value="all">Any</option>
+                            <option value="10">10+</option>
+                            <option value="20">20+</option>
+                            <option value="30">30+</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vehicles Grid -->
+        <section>
+            <div class="container">
+                <div class="vehicles-grid" id="vehiclesGrid">
+                    <!-- Vehicles will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="6" width="18" height="13" rx="2"/>
+                            <path d="M3 9h18M8 19v2m8-2v2M8 6V4m8 2V4"/>
+                        </svg>
+                        <span class="logo-text">Bus Mate</span>
+                    </a>
+                    <p class="footer-tagline">Smart travel solutions for everyone</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4 class="footer-heading">Quick Links</h4>
+                        <ul>
+                            <li><a href="index.html#about">About Us</a></li>
+                            <li><a href="index.html#services">Services</a></li>
+                            <li><a href="vehicles.html">Book Now</a></li>
+                            <li><a href="index.html#contact">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4 class="footer-heading">Services</h4>
+                        <ul>
+                            <li><a href="#">Government Bus</a></li>
+                            <li><a href="#">Private Bus</a></li>
+                            <li><a href="#">Chartered Bus</a></li>
+                            <li><a href="#">E-Rickshaw</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4 class="footer-heading">Contact</h4>
+                        <ul>
+                            <li>Email: info@busmate.com</li>
+                            <li>Phone: +91 123 456 7890</li>
+                            <li>Address: City Center, India</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Bus Mate. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chat Button -->
+    <button class="chat-button" id="chatButton">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+    </button>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header">
+            <h3>Bus Mate Assistant</h3>
+            <button class="chat-close" id="chatClose">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message bot">
+                <p>Hello! How can I help you today? Ask me about routes, fares, or booking!</p>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button id="chatSend">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+    <script>
+        // Vehicle data
+        const vehicles = [
+            {
+                id: 1,
+                name: "City Express 101",
+                type: "government",
+                typeName: "Government Bus",
+                route: "Central Station → Airport",
+                seats: 45,
+                available: 32,
+                rating: 4.5,
+                price: 25,
+                features: ["AC", "WiFi", "USB Charging"],
+                nextDeparture: "15 mins"
+            },
+            {
+                id: 2,
+                name: "Luxury Liner 202",
+                type: "private",
+                typeName: "Private Bus",
+                route: "Tech Park → Shopping Mall",
+                seats: 35,
+                available: 18,
+                rating: 4.8,
+                price: 45,
+                features: ["AC", "WiFi", "Recliner Seats", "Entertainment"],
+                nextDeparture: "30 mins"
+            },
+            {
+                id: 3,
+                name: "Green Shuttle",
+                type: "erickshaw",
+                typeName: "E-Rickshaw",
+                route: "Metro Station → College",
+                seats: 6,
+                available: 4,
+                rating: 4.3,
+                price: 10,
+                features: ["Eco-Friendly", "Fast", "Affordable"],
+                nextDeparture: "5 mins"
+            },
+            {
+                id: 4,
+                name: "Metro Connect 303",
+                type: "government",
+                typeName: "Government Bus",
+                route: "Railway Station → Bus Terminal",
+                seats: 50,
+                available: 42,
+                rating: 4.4,
+                price: 20,
+                features: ["AC", "Wide Seats"],
+                nextDeparture: "20 mins"
+            },
+            {
+                id: 5,
+                name: "Comfort Plus 404",
+                type: "private",
+                typeName: "Private Bus",
+                route: "Airport → City Center",
+                seats: 40,
+                available: 15,
+                rating: 4.9,
+                price: 60,
+                features: ["AC", "WiFi", "Luxury Seats", "Refreshments"],
+                nextDeparture: "45 mins"
+            },
+            {
+                id: 6,
+                name: "Group Charter A1",
+                type: "chartered",
+                typeName: "Chartered Bus",
+                route: "Custom Route Available",
+                seats: 52,
+                available: 52,
+                rating: 4.7,
+                price: 150,
+                features: ["AC", "WiFi", "Custom Route", "Flexible Timing"],
+                nextDeparture: "On Demand"
+            },
+            {
+                id: 7,
+                name: "Eco Ride 505",
+                type: "erickshaw",
+                typeName: "E-Rickshaw",
+                route: "Market → Residential Area",
+                seats: 8,
+                available: 6,
+                rating: 4.2,
+                price: 8,
+                features: ["Eco-Friendly", "Quick", "Local Routes"],
+                nextDeparture: "10 mins"
+            },
+            {
+                id: 8,
+                name: "Night Express 606",
+                type: "private",
+                typeName: "Private Bus",
+                route: "City → Airport (Night Service)",
+                seats: 30,
+                available: 22,
+                rating: 4.6,
+                price: 55,
+                features: ["AC", "WiFi", "Night Service", "Extra Comfort"],
+                nextDeparture: "1 hour"
+            }
+        ];
+
+        // Render vehicles
+        function renderVehicles(filteredVehicles = vehicles) {
+            const grid = document.getElementById('vehiclesGrid');
+            grid.innerHTML = '';
+
+            if (filteredVehicles.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: var(--color-muted); grid-column: 1/-1;">No vehicles found matching your criteria.</p>';
+                return;
+            }
+
+            filteredVehicles.forEach(vehicle => {
+                const card = document.createElement('div');
+                card.className = 'vehicle-card';
+                card.onclick = () => window.location.href = `booking.html?vehicle=${vehicle.id}`;
+                
+                const stars = '★'.repeat(Math.floor(vehicle.rating)) + '☆'.repeat(5 - Math.floor(vehicle.rating));
+                
+                card.innerHTML = `
+                    <div class="vehicle-image">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="6" width="18" height="13" rx="2"/>
+                            <path d="M3 9h18M8 19v2m8-2v2M8 6V4m8 2V4"/>
+                        </svg>
+                        <span class="vehicle-badge">${vehicle.typeName}</span>
+                    </div>
+                    <div class="vehicle-content">
+                        <div class="vehicle-header">
+                            <div>
+                                <h3 class="vehicle-title">${vehicle.name}</h3>
+                                <p class="vehicle-type">${vehicle.route}</p>
+                            </div>
+                            <div class="vehicle-rating">
+                                <span>${stars}</span>
+                                <span style="color: var(--color-foreground); margin-left: 0.25rem;">${vehicle.rating}</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-info">
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                <span>${vehicle.available}/${vehicle.seats} seats</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <span>${vehicle.nextDeparture}</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-features">
+                            ${vehicle.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
+                        </div>
+                        <div class="vehicle-footer">
+                            <div>
+                                <div class="vehicle-price">₹${vehicle.price}</div>
+                                <div class="price-label">per person</div>
+                            </div>
+                            <a href="booking.html?vehicle=${vehicle.id}" class="btn btn-primary" onclick="event.stopPropagation()">Book Now</a>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter functionality
+        function filterVehicles() {
+            const typeFilter = document.getElementById('typeFilter').value;
+            const routeFilter = document.getElementById('routeFilter').value.toLowerCase();
+            const seatsFilter = parseInt(document.getElementById('seatsFilter').value);
+
+            const filtered = vehicles.filter(vehicle => {
+                const typeMatch = typeFilter === 'all' || vehicle.type === typeFilter;
+                const routeMatch = !routeFilter || vehicle.route.toLowerCase().includes(routeFilter) || vehicle.name.toLowerCase().includes(routeFilter);
+                const seatsMatch = !seatsFilter || vehicle.available >= seatsFilter;
+                
+                return typeMatch && routeMatch && seatsMatch;
+            });
+
+            renderVehicles(filtered);
+        }
+
+        // Event listeners
+        document.getElementById('typeFilter').addEventListener('change', filterVehicles);
+        document.getElementById('routeFilter').addEventListener('input', filterVehicles);
+        document.getElementById('seatsFilter').addEventListener('change', filterVehicles);
+
+        // Initial render
+        renderVehicles();
+    </script>
+</body>
+</html>

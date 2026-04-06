@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Tracking - Bus Mate</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .tracking-hero {
+            padding: 120px 0 40px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 136, 112, 0.2) 0%, var(--color-background) 100%);
+        }
+
+        .tracking-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        .tracking-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        .buses-list {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            height: fit-content;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .buses-list h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .bus-item {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .bus-item:hover,
+        .bus-item.active {
+            border-color: var(--color-primary);
+            background: rgba(0, 136, 112, 0.05);
+        }
+
+        .bus-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+        }
+
+        .bus-name {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--color-heading);
+        }
+
+        .bus-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .bus-status.active {
+            background: rgba(0, 136, 112, 0.2);
+            color: var(--color-primary);
+        }
+
+        .bus-route {
+            font-size: 0.875rem;
+            color: var(--color-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .bus-info {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .info-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--color-muted);
+        }
+
+        .info-badge svg {
+            width: 16px;
+            height: 16px;
+            color: var(--color-primary);
+        }
+
+        .map-container {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            min-height: 600px;
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .map-header h3 {
+            font-size: 1.5rem;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.5);
+            }
+        }
+
+        .map-view {
+            background: var(--color-surface);
+            border-radius: 0.75rem;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bus-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 136, 112, 0.4);
+            transition: all 1s ease;
+        }
+
+        .bus-marker svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .route-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, var(--color-primary) 0%, rgba(0, 136, 112, 0.3) 100%);
+            transform-origin: left center;
+        }
+
+        .bus-details {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: var(--color-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-heading);
+        }
+
+        .detail-icon {
+            width: 32px;
+            height: 32px;
+            color: var(--color-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        @media (max-width: 1024px) {
+            .tracking-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .buses-list {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="index.html" class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="6" width="18" height="13" rx="2"/>
+                        <path d="M3 9h18M8 19v2m8-2v2M8 6V4m8 2V4"/>
+                    </svg>
+                    <span class="logo-text">Bus Mate</span>
+                </a>
+                <div class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="vehicles.html" class="nav-link">Vehicles</a></li>
+                    <li><a href="booking.html" class="nav-link">Book</a></li>
+                    <li><a href="driver-dashboard.html" class="nav-link">Driver</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section class="tracking-hero">
+            <div class="container">
+                <h1 class="fade-in">Live Bus Tracking</h1>
+                <p class="hero-description fade-in">Track your bus in real-time</p>
+            </div>
+        </section>
+
+        <!-- Tracking Dashboard -->
+        <div class="tracking-container">
+            <div class="tracking-grid">
+                <!-- Buses List -->
+                <div class="buses-list">
+                    <h3>Active Buses</h3>
+                    <div id="busesList">
+                        <!-- Buses will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Map and Details -->
+                <div class="map-container">
+                    <div class="map-header">
+                        <h3 id="selectedBusName">Select a bus to track</h3>
+                        <div class="live-indicator">
+                            <span class="pulse-dot"></span>
+                            <span>LIVE</span>
+                        </div>
+                    </div>
+
+                    <div class="map-view" id="mapView">
+                        <p style="color: var(--color-muted);">Select a bus from the list to view live tracking</p>
+                    </div>
+
+                    <div class="bus-details" id="busDetails" style="display: none;">
+                        <div class="detail-card">
+                            <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            <div class="detail-label">Estimated Arrival</div>
+                            <div class="detail-value" id="etaValue">-</div>
+                        </div>
+                        <div class="detail-card">
+                            <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <div class="detail-label">Available Seats</div>
+                            <div class="detail-value" id="seatsValue">-</div>
+                        </div>
+                        <div class="detail-card">
+                            <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9 22 9 12 15 12 15 22"/>
+                            </svg>
+                            <div class="detail-label">Current Speed</div>
+                            <div class="detail-value" id="speedValue">-</div>
+                        </div>
+                        <div class="detail-card">
+                            <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="10" r="3"/>
+                                <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 6.9 8 11.7z"/>
+                            </svg>
+                            <div class="detail-label">Next Stop</div>
+                            <div class="detail-value" id="nextStopValue" style="font-size: 1.125rem;">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Bus Mate. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+    <script>
+        const buses = [
+            {
+                id: 1,
+                name: "City Express 101",
+                route: "Central Station → Airport",
+                seats: 32,
+                eta: "8 mins",
+                speed: "45 km/h",
+                nextStop: "Tech Park"
+            },
+            {
+                id: 2,
+                name: "Luxury Liner 202",
+                route: "Tech Park → Shopping Mall",
+                seats: 18,
+                eta: "12 mins",
+                speed: "38 km/h",
+                nextStop: "City Center"
+            },
+            {
+                id: 3,
+                name: "Metro Connect 303",
+                route: "Railway Station → Bus Terminal",
+                seats: 42,
+                eta: "5 mins",
+                speed: "52 km/h",
+                nextStop: "Market Square"
+            },
+            {
+                id: 4,
+                name: "Comfort Plus 404",
+                route: "Airport → City Center",
+                seats: 15,
+                eta: "20 mins",
+                speed: "48 km/h",
+                nextStop: "Airport Exit"
+            }
+        ];
+
+        let selectedBus = null;
+        let animationFrame;
+
+        // Render buses list
+        function renderBusesList() {
+            const container = document.getElementById('busesList');
+            container.innerHTML = '';
+
+            buses.forEach(bus => {
+                const item = document.createElement('div');
+                item.className = 'bus-item';
+                item.onclick = () => selectBus(bus);
+                
+                item.innerHTML = `
+                    <div class="bus-header">
+                        <div class="bus-name">${bus.name}</div>
+                        <div class="bus-status active">ACTIVE</div>
+                    </div>
+                    <div class="bus-route">${bus.route}</div>
+                    <div class="bus-info">
+                        <div class="info-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                            </svg>
+                            <span>${bus.seats} seats</span>
+                        </div>
+                        <div class="info-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            <span>ETA: ${bus.eta}</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        function selectBus(bus) {
+            selectedBus = bus;
+            
+            // Update active state
+            document.querySelectorAll('.bus-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Update header
+            document.getElementById('selectedBusName').textContent = bus.name;
+            
+            // Show details
+            document.getElementById('busDetails').style.display = 'grid';
+            document.getElementById('etaValue').textContent = bus.eta;
+            document.getElementById('seatsValue').textContent = bus.seats;
+            document.getElementById('speedValue').textContent = bus.speed;
+            document.getElementById('nextStopValue').textContent = bus.nextStop;
+            
+            // Animate bus on map
+            animateBusOnMap();
+        }
+
+        function animateBusOnMap() {
+            const mapView = document.getElementById('mapView');
+            mapView.innerHTML = '';
+            
+            // Create route line
+            const routeLine = document.createElement('div');
+            routeLine.className = 'route-line';
+            routeLine.style.width = '80%';
+            routeLine.style.top = '50%';
+            routeLine.style.left = '10%';
+            mapView.appendChild(routeLine);
+            
+            // Create bus marker
+            const busMarker = document.createElement('div');
+            busMarker.className = 'bus-marker';
+            busMarker.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="6" width="18" height="13" rx="2"/>
+                    <path d="M3 9h18"/>
+                </svg>
+            `;
+            mapView.appendChild(busMarker);
+            
+            // Animate bus movement
+            let position = 10;
+            const animate = () => {
+                position += 0.5;
+                if (position > 90) position = 10;
+                
+                busMarker.style.left = position + '%';
+                busMarker.style.top = '50%';
+                busMarker.style.transform = 'translate(-50%, -50%)';
+                
+                animationFrame = requestAnimationFrame(animate);
+            };
+            
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            animate();
+        }
+
+        // Initialize
+        renderBusesList();
+
+        // Update ETA every 5 seconds
+        setInterval(() => {
+            buses.forEach(bus => {
+                const currentMinutes = parseInt(bus.eta);
+                if (currentMinutes > 1) {
+                    bus.eta = (currentMinutes - 1) + ' mins';
+                } else {
+                    bus.eta = Math.floor(Math.random() * 20 + 5) + ' mins';
+                }
+            });
+            
+            renderBusesList();
+            
+            if (selectedBus) {
+                const updatedBus = buses.find(b => b.id === selectedBus.id);
+                if (updatedBus) {
+                    document.getElementById('etaValue').textContent = updatedBus.eta;
+                }
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
