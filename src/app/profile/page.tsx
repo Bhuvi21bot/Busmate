@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { User, Wallet, Settings, Edit, Save, X, Loader2, Bell, Mail, Smartphone, Plus, Download, ArrowUpRight, ArrowDownRight, TrendingUp, DollarSign, FileText, Bus, Star, MessageSquare, ThumbsUp, MapPin, Calendar, Ticket, XCircle } from "lucide-react"
@@ -105,7 +105,7 @@ interface Review {
   createdAt: string
 }
 
-export default function ProfilePage() {
+function ProfilePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -1401,5 +1401,17 @@ export default function ProfilePage() {
         <Footer />
       </div>
     </ClickSpark>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <ProfilePageContent />
+    </Suspense>
   )
 }

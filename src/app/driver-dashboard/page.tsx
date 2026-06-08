@@ -105,7 +105,7 @@ interface DriverReview {
   } | null
 }
 
-export default function DriverDashboard() {
+function DriverDashboardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -532,7 +532,73 @@ export default function DriverDashboard() {
     )
   }
 
+  return (
+    <ClickSpark
+      sparkColor="#4ade80"
+      sparkSize={12}
+      sparkRadius={25}
+      sparkCount={12}
+      duration={600}
+    >
+      <div className="min-h-screen bg-background">
+        <Header />
 
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center">Driver Dashboard</h1>
+
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-8">
+                  <TabsTrigger value="apply" className="flex items-center gap-2">
+                    <UserPlus className="h-4 w-4" />
+                    Apply
+                  </TabsTrigger>
+                  <TabsTrigger value="profile" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Profile
+                  </TabsTrigger>
+                  <TabsTrigger value="wallet" className="flex items-center gap-2">
+                    <Wallet className="h-4 w-4" />
+                    Wallet
+                  </TabsTrigger>
+                  <TabsTrigger value="rides" className="flex items-center gap-2">
+                    <Route className="h-4 w-4" />
+                    Rides
+                  </TabsTrigger>
+                  <TabsTrigger value="reviews" className="flex items-center gap-2">
+                    <Star className="h-4 w-4" />
+                    Reviews
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* Apply Tab - Keep existing form */}
+                <TabsContent value="apply">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Apply as Driver</CardTitle>
+                      <CardDescription>Fill in your details to register as a driver</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="name">Full Name *</Label>
+                            <Input id="name" name="name" required placeholder="Enter your full name" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="contact">Contact Number *</Label>
+                            <Input id="contact" name="contact" required placeholder="10-digit mobile number" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input id="email" name="email" type="email" placeholder="your.email@example.com" />
+                          </div>
+                          <div className="space-y-2">
                             <Label htmlFor="license">License Number *</Label>
                             <Input id="license" name="license" required placeholder="e.g., DL1234567890" />
                           </div>
@@ -1215,8 +1281,19 @@ export default function DriverDashboard() {
           baseItemSize={50}
           magnification={70}
         />
-       </div>
-    </>\n        </Suspense>
+      </div>
     </ClickSpark>
+  )
+}
+
+export default function DriverDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <DriverDashboardContent />
+    </Suspense>
   )
 }
