@@ -148,7 +148,7 @@ async function main() {
     await db.insert(vehicles).values(sampleVehicles);
     
     console.log('✅ Vehicles seeder completed successfully');
-}
+}       
 
 main().catch((error) => {
     console.error('❌ Seeder failed:', error);

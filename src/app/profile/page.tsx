@@ -1075,8 +1075,11 @@ export default function ProfilePage() {
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Choose a completed booking..." />
+                              
                             </SelectTrigger>
                             <SelectContent>
+                             <SelectItem value="Govt. Bus">Govt. Bus</SelectItem>
+                                  <SelectItem value="Private Bus">Private Bus</SelectItem>
                               {bookings
                                 .filter(b => b.status === 'completed')
                                 .map((booking) => (

@@ -344,3 +344,13 @@ export const reviews = mysqlTable(
     reviewDriverIdIdx: index("review_driver_id_idx").on(table.driverId),
   })
 );
+
+// ----- Alias exports for legacy route imports -----
+export const customerWallets = wallets; // alias for wallets
+export const customerWalletTransactions = walletTransactions; // alias for walletTransactions
+export const driverWallets = wallets; // alias for wallets
+export const driverRides = bookings; // alias for bookings (driver rides)
+export const driverSettings = drivers; // alias for drivers (settings)
+export const driversNew = drivers; // alias for drivers (new drivers)
+export const otpVerification = verification; // alias for verification
+export const driverReviews = reviews; // alias for reviews

@@ -34,70 +34,60 @@ export default function ChatBot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
-  const handleSend = async () => {
-  if (!input.trim() || isLoading) return
-
-  const userMessage = {
-    id: crypto.randomUUID(),
-    text: input,
-    sender: "user",
-    timestamp: new Date(),
-  }
-
-  setMessages((prev) => [...prev, userMessage])
-  setInput("")
-  setIsLoading(true)
-
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: userMessage.text }),
-    })
-
-    if (!response.ok) throw new Error("Request failed")
-
-    const reader = response.body?.getReader()
-    if (!reader) throw new Error("No stream")
-
-    const decoder = new TextDecoder()
-    let botText = ""
-
-    const botId = crypto.randomUUID()
-
-    setMessages((prev) => [
-      ...prev,
-      { id: botId, text: "", sender: "bot", timestamp: new Date() },
-    ])
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-
-      botText += decoder.decode(value)
-
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === botId ? { ...m, text: botText } : m
-        )
-      )
+  const getStaticResponse = (query: string): string => {
+    const q = query.toLowerCase().trim()
+    if (q.includes("booking") || q.includes("ticket") || q.includes("book")) {
+      return "To book a ticket, please select your route on the home page, select an available bus, choose your seat, and proceed to checkout using Razorpay or Stripe!"
     }
-  } catch (err) {
-    console.error(err)
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        text: "Sorry, something went wrong.",
-        sender: "bot",
-        timestamp: new Date(),
-      },
-    ])
-  } finally {
-    setIsLoading(false)
+    if (q.includes("route") || q.includes("destination") || q.includes("map")) {
+      return "Bus Mate supports inter-city and intra-city routes. You can search for specific source and destination cities on our home search bar."
+    }
+    if (q.includes("fare") || q.includes("price") || q.includes("cost") || q.includes("pricing")) {
+      return "Fares vary depending on the distance, type of bus (AC/Non-AC, Sleeper/Seater), and any active coupons. Check our 'Pricing' tab or input your details to view current prices."
+    }
+    if (q.includes("driver") || q.includes("register") || q.includes("join")) {
+      return "Drivers can register via our portal or contact onboarding support. You will need a valid commercial driver's license (CDL) and vehicle fitness records."
+    }
+    if (q.includes("hello") || q.includes("hi") || q.includes("hey")) {
+      return "Hello! How can I assist you with your journey today?"
+    }
+    if (q.includes("cancel") || q.includes("refund")) {
+      return "Cancellations are allowed up to 4 hours before the departure time. Refunds are processed back to your original payment method within 5-7 business days."
+    }
+    if (q.includes("contact") || q.includes("support") || q.includes("help") || q.includes("phone")) {
+      return "You can reach our customer service department at support@busmate.com or call our toll-free line at 1-800-555-MATE."
+    }
+    return "Thank you for reaching out! I'm a pre-programmed assistant. For more detailed support, please reach out to support@busmate.com."
   }
-}
+
+  const handleSend = () => {
+    if (!input.trim() || isLoading) return
+
+    const userMsgText = input
+    const userMessage = {
+      id: crypto.randomUUID(),
+      text: userMsgText,
+      sender: "user" as const,
+      timestamp: Date.now(),
+    }
+
+    setMessages((prev) => [...prev, userMessage])
+    setInput("")
+    setIsLoading(true)
+
+    // Simulate small delay for static responses to feel more natural
+    setTimeout(() => {
+      const responseText = getStaticResponse(userMsgText)
+      const botMessage = {
+        id: crypto.randomUUID(),
+        text: responseText,
+        sender: "bot" as const,
+        timestamp: Date.now(),
+      }
+      setMessages((prev) => [...prev, botMessage])
+      setIsLoading(false)
+    }, 600)
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {

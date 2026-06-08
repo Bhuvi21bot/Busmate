@@ -29,3 +29,4 @@ if (!global.__dbPool) {
 }
 
 export const db = drizzle(connection);
+export * from "./schema";
