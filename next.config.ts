@@ -17,18 +17,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  outputFileTracingRoot: path.resolve(__dirname, "../../"),
   typescript: {
     ignoreBuildErrors: true,
   },
   turbopack: enableOrchidsTagger
     ? {
-        rules: {
-          "*.{jsx,tsx}": {
-            loaders: [LOADER],
-          },
+      rules: {
+        "*.{jsx,tsx}": {
+          loaders: [LOADER],
         },
-      }
+      },
+    }
     : undefined,
 };
 
