@@ -8,6 +8,7 @@ import ChatBot from "@/components/ChatBot";
 import CustomAutumnProvider from "@/lib/autumn-provider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { LanguageProvider } from "@/providers/LanguageProvider";
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: "Bus Mate - Smart Bus Booking Platform",
@@ -47,6 +48,7 @@ export default function RootLayout({
           </LanguageProvider>
         </ThemeProvider>
         <VisualEditsMessenger />
+        <Analytics />
       </body>
     </html>
   );
